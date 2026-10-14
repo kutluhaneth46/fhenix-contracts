@@ -36,7 +36,8 @@ contract MockFheOps {
         } else if (utype == 4) {
             result = uint256(type(uint128).max) + 1;
         } else if (utype == 5) {
-            result = 1;
+            // Native uint256 wraps at 2**256; 0 means "skip modulo" in applyTypeBound.
+            result = 0;
         } else if (utype == 12) {
             result = uint256(type(uint160).max) + 1; //address
         } else if (utype == 13) {
@@ -46,6 +47,15 @@ contract MockFheOps {
         }
 
         return result;
+    }
+
+
+    function applyTypeBound(uint8 utype, uint256 value) internal pure returns (uint256) {
+        uint256 mv = maxValue(utype);
+        if (mv == 0) {
+            return value;
+        }
+        return value % mv;
     }
 
     function bytes32ToBytes(
@@ -110,8 +120,7 @@ contract MockFheOps {
         bytes memory lhsHash,
         bytes memory rhsHash
     ) external pure returns (bytes memory) {
-        uint256 result = (bytesToUint(lhsHash) + bytesToUint(rhsHash)) %
-            maxValue(utype);
+        uint256 result = applyTypeBound(utype, bytesToUint(lhsHash) + bytesToUint(rhsHash));
         return uint256ToBytes(result);
     }
 
@@ -156,8 +165,8 @@ contract MockFheOps {
         bytes memory lhsHash,
         bytes memory rhsHash
     ) external pure returns (bytes memory) {
-        bool result = (bytesToUint(lhsHash) % maxValue(utype)) <=
-            (bytesToUint(rhsHash) % maxValue(utype));
+        bool result = applyTypeBound(utype, bytesToUint(lhsHash)) <=
+            applyTypeBound(utype, bytesToUint(rhsHash));
         return boolToBytes(result);
     }
 
@@ -166,8 +175,7 @@ contract MockFheOps {
         bytes memory lhsHash,
         bytes memory rhsHash
     ) external pure returns (bytes memory) {
-        uint256 result = (bytesToUint(lhsHash) - bytesToUint(rhsHash)) %
-            maxValue(utype);
+        uint256 result = applyTypeBound(utype, bytesToUint(lhsHash) - bytesToUint(rhsHash));
         return uint256ToBytes(result);
     }
 
@@ -176,8 +184,7 @@ contract MockFheOps {
         bytes memory lhsHash,
         bytes memory rhsHash
     ) external pure returns (bytes memory) {
-        uint256 result = (bytesToUint(lhsHash) * bytesToUint(rhsHash)) %
-            maxValue(utype);
+        uint256 result = applyTypeBound(utype, bytesToUint(lhsHash) * bytesToUint(rhsHash));
         return uint256ToBytes(result);
     }
 
@@ -186,8 +193,8 @@ contract MockFheOps {
         bytes memory lhsHash,
         bytes memory rhsHash
     ) external pure returns (bytes memory) {
-        bool result = (bytesToUint(lhsHash) % maxValue(utype)) <
-            (bytesToUint(rhsHash) % maxValue(utype));
+        bool result = applyTypeBound(utype, bytesToUint(lhsHash)) <
+            applyTypeBound(utype, bytesToUint(rhsHash));
         return boolToBytes(result);
     }
 
@@ -216,8 +223,7 @@ contract MockFheOps {
         bytes memory lhsHash,
         bytes memory rhsHash
     ) external pure returns (bytes memory) {
-        uint256 result = (bytesToUint(lhsHash) / bytesToUint(rhsHash)) %
-            maxValue(utype);
+        uint256 result = applyTypeBound(utype, bytesToUint(lhsHash) / bytesToUint(rhsHash));
         return uint256ToBytes(result);
     }
 
@@ -226,8 +232,8 @@ contract MockFheOps {
         bytes memory lhsHash,
         bytes memory rhsHash
     ) external pure returns (bytes memory) {
-        bool result = (bytesToUint(lhsHash) % maxValue(utype)) >
-            (bytesToUint(rhsHash) % maxValue(utype));
+        bool result = applyTypeBound(utype, bytesToUint(lhsHash)) >
+            applyTypeBound(utype, bytesToUint(rhsHash));
         return boolToBytes(result);
     }
 
@@ -236,8 +242,8 @@ contract MockFheOps {
         bytes memory lhsHash,
         bytes memory rhsHash
     ) external pure returns (bytes memory) {
-        bool result = (bytesToUint(lhsHash) % maxValue(utype)) >=
-            (bytesToUint(rhsHash) % maxValue(utype));
+        bool result = applyTypeBound(utype, bytesToUint(lhsHash)) >=
+            applyTypeBound(utype, bytesToUint(rhsHash));
         return boolToBytes(result);
     }
 
@@ -246,8 +252,7 @@ contract MockFheOps {
         bytes memory lhsHash,
         bytes memory rhsHash
     ) external pure returns (bytes memory) {
-        uint256 result = (bytesToUint(lhsHash) % bytesToUint(rhsHash)) %
-            maxValue(utype);
+        uint256 result = applyTypeBound(utype, bytesToUint(lhsHash) % bytesToUint(rhsHash));
         return uint256ToBytes(result);
     }
 
@@ -283,8 +288,8 @@ contract MockFheOps {
         bytes memory lhsHash,
         bytes memory rhsHash
     ) external pure returns (bytes memory) {
-        bool result = (bytesToUint(lhsHash) % maxValue(utype)) ==
-            (bytesToUint(rhsHash) % maxValue(utype));
+        bool result = applyTypeBound(utype, bytesToUint(lhsHash)) ==
+            applyTypeBound(utype, bytesToUint(rhsHash));
         return boolToBytes(result);
     }
 
@@ -293,8 +298,8 @@ contract MockFheOps {
         bytes memory lhsHash,
         bytes memory rhsHash
     ) external pure returns (bytes memory) {
-        bool result = (bytesToUint(lhsHash) % maxValue(utype)) !=
-            (bytesToUint(rhsHash) % maxValue(utype));
+        bool result = applyTypeBound(utype, bytesToUint(lhsHash)) !=
+            applyTypeBound(utype, bytesToUint(rhsHash));
         return boolToBytes(result);
     }
 
@@ -303,8 +308,8 @@ contract MockFheOps {
         bytes memory lhsHash,
         bytes memory rhsHash
     ) external pure returns (bytes memory) {
-        bool result = (bytesToUint(lhsHash) % maxValue(utype)) >=
-            (bytesToUint(rhsHash) % maxValue(utype));
+        bool result = applyTypeBound(utype, bytesToUint(lhsHash)) >=
+            applyTypeBound(utype, bytesToUint(rhsHash));
         if (result == true) {
             return rhsHash;
         }
@@ -316,8 +321,8 @@ contract MockFheOps {
         bytes memory lhsHash,
         bytes memory rhsHash
     ) external pure returns (bytes memory) {
-        bool result = (bytesToUint(lhsHash) % maxValue(utype)) >=
-            (bytesToUint(rhsHash) % maxValue(utype));
+        bool result = applyTypeBound(utype, bytesToUint(lhsHash)) >=
+            applyTypeBound(utype, bytesToUint(rhsHash));
         if (result == true) {
             return lhsHash;
         }
@@ -371,7 +376,7 @@ contract MockFheOps {
     ) external view returns (bytes memory) {
         return
             uint256ToBytes(
-                uint(keccak256(abi.encode(block.timestamp))) % maxValue(utype)
+                applyTypeBound(utype, uint(keccak256(abi.encode(block.timestamp))))
             );
     }
 }
