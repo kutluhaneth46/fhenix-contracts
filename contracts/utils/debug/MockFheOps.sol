@@ -101,7 +101,7 @@ contract MockFheOps {
         uint8 toType,
         int32
     ) external pure returns (bytes memory) {
-        bytes32 result = bytes32(input);
+        bytes32 result = bytes32(bytesToUint(input));
         return bytes32ToBytes(result, toType);
     }
 
@@ -136,7 +136,7 @@ contract MockFheOps {
         bytes memory input,
         uint8 toType
     ) external pure returns (bytes memory) {
-        bytes32 result = bytes32(input);
+        bytes32 result = bytes32(bytesToUint(input));
         return bytes32ToBytes(result, toType);
     }
 
