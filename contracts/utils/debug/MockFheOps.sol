@@ -256,8 +256,8 @@ contract MockFheOps {
         bytes memory lhsHash,
         bytes memory rhsHash
     ) external pure returns (bytes memory) {
-        bytes32 result = bytes32(lhsHash) & bytes32(rhsHash);
-        return bytes32ToBytes(result, utype);
+        uint256 result = bytesToUint(lhsHash) & bytesToUint(rhsHash);
+        return bytes32ToBytes(bytes32(result), utype);
     }
 
     function or(
@@ -265,8 +265,8 @@ contract MockFheOps {
         bytes memory lhsHash,
         bytes memory rhsHash
     ) external pure returns (bytes memory) {
-        bytes32 result = bytes32(lhsHash) | bytes32(rhsHash);
-        return bytes32ToBytes(result, utype);
+        uint256 result = bytesToUint(lhsHash) | bytesToUint(rhsHash);
+        return bytes32ToBytes(bytes32(result), utype);
     }
 
     function xor(
@@ -274,8 +274,8 @@ contract MockFheOps {
         bytes memory lhsHash,
         bytes memory rhsHash
     ) external pure returns (bytes memory) {
-        bytes32 result = bytes32(lhsHash) ^ bytes32(rhsHash);
-        return bytes32ToBytes(result, utype);
+        uint256 result = bytesToUint(lhsHash) ^ bytesToUint(rhsHash);
+        return bytes32ToBytes(bytes32(result), utype);
     }
 
     function eq(
@@ -354,8 +354,8 @@ contract MockFheOps {
         uint8 utype,
         bytes memory value
     ) external pure returns (bytes memory) {
-        bytes32 result = ~bytes32(value);
-        return bytes32ToBytes(result, utype);
+        uint256 result = ~bytesToUint(value);
+        return bytes32ToBytes(bytes32(result), utype);
     }
 
     function getNetworkPublicKey(int32) external pure returns (bytes memory) {
