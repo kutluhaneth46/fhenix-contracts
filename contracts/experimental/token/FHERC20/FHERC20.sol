@@ -49,6 +49,7 @@ contract FHERC20 is IFHERC20, ERC20, Permissioned {
             revert ERC20InvalidSpender(address(0));
         }
         _allowed[owner][spender] = value;
+        emit ApprovalEncrypted(owner, spender);
     }
 
     function _spendAllowance(address owner, address spender, euint128 value) internal virtual returns (euint128) {
@@ -118,6 +119,8 @@ contract FHERC20 is IFHERC20, ERC20, Permissioned {
         // Add to the balance of `to` and subract from the balance of `from`.
         _encBalances[to] = _encBalances[to] + amountToSend;
         _encBalances[from] = _encBalances[from] - amountToSend;
+
+        emit TransferEncrypted(from, to);
 
         return amountToSend;
     }
