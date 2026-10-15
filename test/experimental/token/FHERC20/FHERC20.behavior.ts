@@ -205,6 +205,55 @@ function shouldBehaveLikeFHERC20(initialSupply, accounts, opts = {}) {
       return this.token.approveEncrypted(spender, encryptedValue, { from: owner });
     });
   });
+
+  describe('increaseAllowanceEncrypted / decreaseAllowanceEncrypted', function () {
+    const spender = recipient;
+
+    it('increases an existing allowance without replacing it', async function () {
+      const initialEnc = await fhenixjs.encrypt_uint128(10n);
+      await this.token.approveEncrypted(spender, initialEnc, { from: initialHolder });
+
+      const addedEnc = await fhenixjs.encrypt_uint128(5n);
+      await this.token.increaseAllowanceEncrypted(spender, addedEnc, { from: initialHolder });
+
+      const sealed = await this.token.allowanceEncrypted(
+        initialHolder,
+        spender,
+        await this.getPermission(spender),
+      );
+      expect(fhenixjs.unseal(this.token.address, sealed)).to.equal(15n);
+    });
+
+    it('decreases an existing allowance without replacing it', async function () {
+      const initialEnc = await fhenixjs.encrypt_uint128(10n);
+      await this.token.approveEncrypted(spender, initialEnc, { from: initialHolder });
+
+      const subEnc = await fhenixjs.encrypt_uint128(4n);
+      await this.token.decreaseAllowanceEncrypted(spender, subEnc, { from: initialHolder });
+
+      const sealed = await this.token.allowanceEncrypted(
+        initialHolder,
+        spender,
+        await this.getPermission(spender),
+      );
+      expect(fhenixjs.unseal(this.token.address, sealed)).to.equal(6n);
+    });
+
+    it('floors decrease at zero when subtractedValue exceeds current allowance', async function () {
+      const initialEnc = await fhenixjs.encrypt_uint128(3n);
+      await this.token.approveEncrypted(spender, initialEnc, { from: initialHolder });
+
+      const subEnc = await fhenixjs.encrypt_uint128(10n);
+      await this.token.decreaseAllowanceEncrypted(spender, subEnc, { from: initialHolder });
+
+      const sealed = await this.token.allowanceEncrypted(
+        initialHolder,
+        spender,
+        await this.getPermission(spender),
+      );
+      expect(fhenixjs.unseal(this.token.address, sealed)).to.equal(0n);
+    });
+  });
 }
 
 function shouldBehaveLikeFHERC20Transfer(from, to, balance, transfer) {

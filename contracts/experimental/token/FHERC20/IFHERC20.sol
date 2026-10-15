@@ -68,14 +68,34 @@ interface IFHERC20 {
      *
      * IMPORTANT: Beware that changing an allowance with this method brings the risk
      * that someone may use both the old and the new allowance by unfortunate
-     * transaction ordering. One possible solution to mitigate this race
-     * condition is to first reduce the spender's allowance to 0 and set the
-     * desired value afterwards:
+     * transaction ordering. Prefer {increaseAllowanceEncrypted} /
+     * {decreaseAllowanceEncrypted}, or first reduce the spender's allowance to 0
+     * and set the desired value afterwards:
      * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
      *
      * Emits an {ApprovalEncrypted} event.
      */
     function approveEncrypted(address spender, inEuint128 calldata value) external returns (bool);
+
+    /**
+     * @dev Atomically increases the allowance granted to `spender` by the caller.
+     *
+     * This is an alternative to {approveEncrypted} that can be used as a mitigation
+     * for the problems described there.
+     *
+     * Emits an {ApprovalEncrypted} event indicating the updated allowance.
+     */
+    function increaseAllowanceEncrypted(address spender, inEuint128 calldata addedValue) external returns (bool);
+
+    /**
+     * @dev Atomically decreases the allowance granted to `spender` by the caller.
+     *
+     * This is an alternative to {approveEncrypted} that can be used as a mitigation
+     * for the problems described there. Decreases floor at zero (no encrypted underflow).
+     *
+     * Emits an {ApprovalEncrypted} event indicating the updated allowance.
+     */
+    function decreaseAllowanceEncrypted(address spender, inEuint128 calldata subtractedValue) external returns (bool);
 
     /**
      * @dev Moves a `value` amount of tokens from `from` to `to` using the
